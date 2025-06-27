@@ -33,24 +33,27 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 backdrop-blur-md transition-all duration-300 animate-fadeIn px-4 ${
-        scrolled ? "h-16 shadow-md bg-black/90" : "h-20 bg-black"
+      className={`fixed top-0 w-full z-50 transition-all duration-300 animate-fadeIn border-b ${
+        scrolled ? "h-16 shadow-md bg-black/90 backdrop-blur-md border-neutral-700" : "h-20 bg-black/15 border-neutral-800"
       }`}
     >
-      <nav className="flex justify-between items-center h-full w-full">
-        {/* Logo: absolute left */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/logo.png" // make sure this logo has a transparent background
-            alt="MENTRA Logo"
-            width={120}
-            height={60}
-            className="h-auto w-auto object-contain transition-transform duration-300 hover:scale-105"
-            priority
-          />
-        </Link>
+      <nav className="flex justify-between items-center h-full w-full px-4">
+        {/* Logo aligned to the very left */}
+        <div className="flex items-center h-full">
 
-        {/* Right Section: Tools, Dropdowns, Auth */}
+        <Link href="/" className="flex items-center h-full">
+          <Image
+            src={"/logos.png"}
+            alt="MENTRA Logo"
+            width={130}
+            height={50}
+            className="object-contain transition-transform duration-300 hover:scale-105"
+            priority
+            />
+        </Link>
+            </div>
+
+        {/* Right-aligned controls */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <SignedIn>
             <Link href="/dashboard">
@@ -119,4 +122,5 @@ export default function Header() {
     </header>
   );
 }
+
 
