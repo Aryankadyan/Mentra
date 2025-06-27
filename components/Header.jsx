@@ -39,19 +39,18 @@ export default function Header() {
     >
       <nav className="flex justify-between items-center h-full w-full px-4">
         {/* Logo aligned to the very left */}
-        <div className="flex items-center h-full">
 
         <Link href="/" className="flex items-center h-full">
           <Image
             src={"/logos.png"}
             alt="MENTRA Logo"
-            width={130}
-            height={50}
+            width={170}
+            height={70}
             className="object-contain transition-transform duration-300 hover:scale-105"
             priority
             />
         </Link>
-            </div>
+            
 
         {/* Right-aligned controls */}
         <div className="flex items-center space-x-2 md:space-x-4">
