@@ -1,4 +1,4 @@
-"use client";"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -33,26 +33,24 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 backdrop-blur-md transition-all duration-300 animate-fadeIn ${
+      className={`fixed top-0 w-full z-50 backdrop-blur-md transition-all duration-300 animate-fadeIn px-4 ${
         scrolled ? "h-16 shadow-md bg-black/90" : "h-20 bg-black"
       }`}
     >
-      <nav className="flex justify-between items-center h-full px-4 max-w-7xl mx-auto">
-        {/* Logo with white/gray container */}
-        <div className="flex items-center px-2 py-1 rounded-lg bg-gray-100 border border-gray-300 shadow-sm">
-          <Link href="/" className="block h-full">
-            <Image
-              src="/logo.png"
-              alt="MENTRA Logo"
-              width={110}
-              height={60}
-              className="h-auto w-auto object-contain transition-transform duration-300 hover:scale-105"
-              priority
-            />
-          </Link>
-        </div>
+      <nav className="flex justify-between items-center h-full w-full">
+        {/* Logo: absolute left */}
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo.png" // make sure this logo has a transparent background
+            alt="MENTRA Logo"
+            width={120}
+            height={60}
+            className="h-auto w-auto object-contain transition-transform duration-300 hover:scale-105"
+            priority
+          />
+        </Link>
 
-        {/* Right section: Buttons and User */}
+        {/* Right Section: Tools, Dropdowns, Auth */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <SignedIn>
             <Link href="/dashboard">
@@ -65,7 +63,6 @@ export default function Header() {
               </Button>
             </Link>
 
-            {/* Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button className="flex items-center gap-2 transition-transform duration-200 hover:scale-105">
@@ -122,3 +119,4 @@ export default function Header() {
     </header>
   );
 }
+
