@@ -258,7 +258,7 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="secondary"
-                className="h-12 px-8 bg-black text-primary hover:bg-primary hover:text-white transition-colors duration-300 animate-bounce"
+                className="h-12 px-8 bg-black text-primary hover:bg-primary hover:text-teal-300 transition-colors duration-300 animate-bounce"
               >
                 Start Your Journey Today
                 <ArrowRight className="ml-2 h-5 w-5" />

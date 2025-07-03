@@ -44,8 +44,8 @@ export default function Header() {
           <Image
             src={"/logos.png"}
             alt="MENTRA Logo"
-            width={170}
-            height={70}
+            width={190}
+            height={80}
             className="object-contain transition-transform duration-300 hover:scale-105"
             priority
             />
