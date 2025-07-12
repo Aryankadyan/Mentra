@@ -1,6 +1,6 @@
 "use server";
 
-import {db} from "@/lib/prisma";
+import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { generateAIInsights } from "./dashboard";
@@ -9,49 +9,53 @@ export async function updateUser(data) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  let user = await db.user.findUnique({
+  const user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
 
-  // 👇 If user not found in DB, auto-create it
-  if (!user) {
-    console.log("⚠️ User not found. Creating new user...");
-    user = await db.user.create({
-      data: {
-        clerkUserId: userId,
-        email: "placeholder@example.com", // 📝 Replace later
-        name: "New User",
-      },
-    });
-    console.log("✨ Auto-created user:", user.id);
-  }
+  if (!user) throw new Error("User not found");
+
+  // 👇 Check if Gemini API key is loaded
+  console.log("🔑 Gemini API Key:", process.env.GOOGLE_API_KEY);
 
   try {
     const result = await db.$transaction(
       async (tx) => {
-        // Check if industry exists
         let industryInsight = await tx.industryInsight.findUnique({
-          where: { industry: data.industry },
+          where: {
+            industry: data.industry,
+          },
         });
 
-        // If not, generate & create it
+        // If industry doesn't exist, create it with Gemini insights or fallback
         if (!industryInsight) {
-          console.log("⚠️ Industry not found. Generating insights...");
-          const insights = await generateAIInsights(data.industry);
+          let insights = {};
 
-          industryInsight = await tx.industryInsight.create({
+          if (process.env.GOOGLE_API_KEY) {
+            try {
+              insights = await generateAIInsights(data.industry);
+            } catch (geminiError) {
+              console.error("⚠️ Gemini API error:", geminiError.message);
+              // fallback to empty insights if Gemini fails
+              insights = {};
+            }
+          } else {
+            console.warn("⚠️ GOOGLE_API_KEY missing. Skipping Gemini insights.");
+          }
+
+          industryInsight = await db.industryInsight.create({
             data: {
               industry: data.industry,
               ...insights,
               nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             },
           });
-          console.log("✨ Created IndustryInsight:", industryInsight.id);
         }
 
-        // Update user profile
         const updatedUser = await tx.user.update({
-          where: { id: user.id },
+          where: {
+            id: user.id,
+          },
           data: {
             industry: data.industry,
             experience: data.experience,
@@ -62,13 +66,15 @@ export async function updateUser(data) {
 
         return { updatedUser, industryInsight };
       },
-      { timeout: 10000 }
+      {
+        timeout: 10000, // default: 5000
+      }
     );
 
-    revalidatePath("/dashboard");
-    return result.updatedUser;
+    revalidatePath("/");
+    return result.user;
   } catch (error) {
-    console.error("❌ Error in updateUser:", error);
+    console.error("Error updating user and industry:", error.message);
     throw new Error("Failed to update profile");
   }
 }
@@ -77,28 +83,28 @@ export async function getUserOnboardingStatus() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  let user = await db.user.findUnique({
+  const user = await db.user.findUnique({
     where: { clerkUserId: userId },
-    select: { industry: true },
   });
 
-  // 👇 Auto-create user if not found
-  if (!user) {
-    console.log("⚠️ User not found in DB. Creating new user...");
-    user = await db.user.create({
-      data: {
+  if (!user) throw new Error("User not found");
+
+  try {
+    const user = await db.user.findUnique({
+      where: {
         clerkUserId: userId,
-        email: "placeholder@example.com",
-        name: "New User",
       },
-      select: { industry: true },
+      select: {
+        industry: true,
+      },
     });
-    console.log("✨ Auto-created user:", userId);
+
+    return {
+      isOnboarded: !!user?.industry,
+    };
+  } catch (error) {
+    console.error("Error checking onboarding status:", error);
+    throw new Error("Failed to check onboarding status");
   }
-
-  return { isOnboarded: !!user.industry };
 }
-
-
-
 
