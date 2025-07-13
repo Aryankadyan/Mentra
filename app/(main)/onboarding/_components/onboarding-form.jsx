@@ -26,14 +26,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import useFetch from "@/hooks/use-fetch";
 import { onboardingSchema } from "@/app/lib/schema";
 import { updateUser } from "@/actions/user";
 
 const OnboardingForm = ({ industries }) => {
   const router = useRouter();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
-  const [updateLoading, setUpdateLoading] = useState(false);
-  const [updateResult, setUpdateResult] = useState(null);
+
+  const {
+    loading: updateLoading,
+    fn: updateUserFn,
+    data: updateResult,
+  } = useFetch(updateUser);
 
   const {
     register,
@@ -47,22 +52,16 @@ const OnboardingForm = ({ industries }) => {
 
   const onSubmit = async (values) => {
     try {
-      setUpdateLoading(true);
       const formattedIndustry = `${values.industry}-${values.subIndustry
         .toLowerCase()
         .replace(/ /g, "-")}`;
 
-      const result = await updateUser({
+      await updateUserFn({
         ...values,
         industry: formattedIndustry,
       });
-
-      setUpdateResult({ success: true, result });
     } catch (error) {
-      console.error("❌ Onboarding error:", error);
-      toast.error("Failed to update profile.");
-    } finally {
-      setUpdateLoading(false);
+      console.error("Onboarding error:", error);
     }
   };
 
