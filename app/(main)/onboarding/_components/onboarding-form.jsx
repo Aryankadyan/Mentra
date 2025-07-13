@@ -31,8 +31,9 @@ import { updateUser } from "@/actions/user";
 
 const OnboardingForm = ({ industries }) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [updateResult, setUpdateResult] = useState(null);
 
   const {
     register,
@@ -45,26 +46,33 @@ const OnboardingForm = ({ industries }) => {
   });
 
   const onSubmit = async (values) => {
-    setLoading(true);
     try {
+      setUpdateLoading(true);
       const formattedIndustry = `${values.industry}-${values.subIndustry
         .toLowerCase()
         .replace(/ /g, "-")}`;
 
-      await updateUser({
+      const result = await updateUser({
         ...values,
         industry: formattedIndustry,
       });
 
-      toast.success("🎉 Profile completed successfully!");
-      router.push("/dashboard");
+      setUpdateResult({ success: true, result });
     } catch (error) {
       console.error("❌ Onboarding error:", error);
-      toast.error("Failed to complete profile. Please try again.");
+      toast.error("Failed to update profile.");
     } finally {
-      setLoading(false);
+      setUpdateLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (updateResult?.success && !updateLoading) {
+      toast.success("Profile completed successfully!");
+      router.push("/dashboard");
+      router.refresh();
+    }
+  }, [updateResult, updateLoading]);
 
   const watchIndustry = watch("industry");
 
@@ -82,7 +90,6 @@ const OnboardingForm = ({ industries }) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Industry */}
             <div className="space-y-2">
               <Label htmlFor="industry">Industry</Label>
               <Select
@@ -115,7 +122,6 @@ const OnboardingForm = ({ industries }) => {
               )}
             </div>
 
-            {/* SubIndustry */}
             {watchIndustry && (
               <div className="space-y-2">
                 <Label htmlFor="subIndustry">Specialization</Label>
@@ -128,7 +134,7 @@ const OnboardingForm = ({ industries }) => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Specializations</SelectLabel>
-                      {selectedIndustry?.subIndustries?.map((sub) => (
+                      {selectedIndustry?.subIndustries.map((sub) => (
                         <SelectItem key={sub} value={sub}>
                           {sub}
                         </SelectItem>
@@ -144,7 +150,6 @@ const OnboardingForm = ({ industries }) => {
               </div>
             )}
 
-            {/* Experience */}
             <div className="space-y-2">
               <Label htmlFor="experience">Years of Experience</Label>
               <Input
@@ -162,7 +167,6 @@ const OnboardingForm = ({ industries }) => {
               )}
             </div>
 
-            {/* Skills */}
             <div className="space-y-2">
               <Label htmlFor="skills">Skills</Label>
               <Input
@@ -178,7 +182,6 @@ const OnboardingForm = ({ industries }) => {
               )}
             </div>
 
-            {/* Bio */}
             <div className="space-y-2">
               <Label htmlFor="bio">Professional Bio</Label>
               <Textarea
@@ -192,8 +195,8 @@ const OnboardingForm = ({ industries }) => {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
+            <Button type="submit" className="w-full" disabled={updateLoading}>
+              {updateLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...

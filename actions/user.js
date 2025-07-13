@@ -15,33 +15,20 @@ export async function updateUser(data) {
 
   if (!user) throw new Error("User not found");
 
-  // 👇 Check if Gemini API key is loaded
-  console.log("🔑 Gemini API Key:", process.env.GOOGLE_API_KEY);
-
   try {
+    // Start a transaction to handle both operations
     const result = await db.$transaction(
       async (tx) => {
+        // First check if industry exists
         let industryInsight = await tx.industryInsight.findUnique({
           where: {
             industry: data.industry,
           },
         });
 
-        // If industry doesn't exist, create it with Gemini insights or fallback
+        // If industry doesn't exist, create it with default values
         if (!industryInsight) {
-          let insights = {};
-
-          if (process.env.GOOGLE_API_KEY) {
-            try {
-              insights = await generateAIInsights(data.industry);
-            } catch (geminiError) {
-              console.error("⚠️ Gemini API error:", geminiError.message);
-              // fallback to empty insights if Gemini fails
-              insights = {};
-            }
-          } else {
-            console.warn("⚠️ GOOGLE_API_KEY missing. Skipping Gemini insights.");
-          }
+          const insights = await generateAIInsights(data.industry);
 
           industryInsight = await db.industryInsight.create({
             data: {
@@ -52,6 +39,7 @@ export async function updateUser(data) {
           });
         }
 
+        // Now update the user
         const updatedUser = await tx.user.update({
           where: {
             id: user.id,
@@ -107,4 +95,7 @@ export async function getUserOnboardingStatus() {
     throw new Error("Failed to check onboarding status");
   }
 }
+
+
+
 
