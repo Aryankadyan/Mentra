@@ -1,6 +1,10 @@
 " use client";
 
 import React from 'react'
+import {LineChart, TrendingUp, TrendingDown} from 'lucide-react';
+import {format, formatDistanceToNow} from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const DashboardView = ({insights}) => {
   const salaryData = insights.salaryRanges.map((range) => ({
@@ -40,8 +44,29 @@ const DashboardView = ({insights}) => {
   const OutlookIcon = getMarketOutlookInfo(insights.marketOutlook).icon;
   const outlookColor = getMarketOutlookInfo(insights.marketOutlook).color;
 
-  const lastUpdatedDate = format(new Date(insights, lastUpdated), "dd/MM/YY");
-  return <div>DashboardView</div>
+  const lastUpdatedDate = format(new Date(insights, lastUpdated), "dd/MM/yyyy");
+  const nextUpdateDate = formatDistanceToNow(
+    new Date(insights.nextUpdate),
+    {addSuffix: true}
+  )
+  return (
+    <div className='space-y-6'>
+      <div className='flex-justify-between items-center'>
+        <Badge variant="outline">Last updated: {lastUpdatedDate}</Badge>
+      </div>
+      <div>
+        <Card>
+  <CardHeader>
+    <CardTitle>Market Outlook</CardTitle>
+    <OutlookIcon className={`h-4 w-4 ${outlookColor}`}/>
+  </CardHeader>
+  <CardContent>
+    <p>Card Content</p>
+  </CardContent>
+</Card>
+      </div>
+    </div>
+  )
 }
 
 export default DashboardView
