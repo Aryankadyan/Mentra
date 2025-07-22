@@ -21,7 +21,7 @@ export const generateAIInsights = async (industry) => {
             "keyTrends": ["trend1", "trend2"],
             "recommendedSkills": ["skill1", "skill2"]
           }
-          
+          h
           IMPORTANT: Return ONLY the JSON. No additional text, notes, or markdown formatting.
           Include at least 5 common roles for salary ranges.
           Growth rate should be a percentage.
