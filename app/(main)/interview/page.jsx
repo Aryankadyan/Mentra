@@ -1,5 +1,11 @@
-const InterviewPage = () => {
-    return <div>InterviewPage</div>
+import React from 'react'
+
+const page = () => {
+  return (
+    <div>
+      MockInterviewPage
+    </div>
+  )
 }
 
-export default InterviewPage
+export default page
