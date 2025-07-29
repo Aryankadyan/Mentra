@@ -9,7 +9,7 @@ export default function QuizResult({
   result,
   hideStartNew = false,
   onStartNew,
-}) {
+}) { 
   if (!result) return null;
 
   return (
