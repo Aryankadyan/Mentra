@@ -27,3 +27,12 @@ export const onboardingSchema = z.object({
         : undefined
 ),
 })
+
+export(const contactSchema = z.object({
+    eSchema = z.object({
+    email: z.string().email("INvalid email address/")
+    mobile: z.string().optional(),
+  
+
+
+}))

@@ -1,12 +1,44 @@
 "use client"
 
-const ResumeBuilder = ({initialContent}) => {
-  return(
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { Download, Save } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+const ResumeBuilder = ({ initialContent }) => {
+  const [activateTab, setActiveTab] = useState("edit");
+
+  useForm()
+  
+  return (
     <div>
       <div className="flex flex-col md:flex-row justify-between items-center gap-2">
         <h1 className="font-bold gradient-title text-5xl md:text-6xl">
-        ResumeBu
+          Resume Builder
         </h1>
+
+        <div className="space-x-2">
+          <Button variant="destructive">
+            <Save className="h-4 w-4" />
+            Save
+          </Button>
+          <Button>
+            <Download className="h-4 w-4" />
+            Download PDF
+          </Button>
+        </div>
+      </div>
+
+  <Tabs defaultValue="account" className="w-[400px]">
+  <TabsList>
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="password">Password</TabsTrigger>
+  </TabsList>
+  <TabsContent value="account">Make changes to your account here.</TabsContent>
+  <TabsContent value="password">Change your password here.</TabsContent>
+</Tabs>
+    </div>
   )
-  }
+}
 export default ResumeBuilder;
